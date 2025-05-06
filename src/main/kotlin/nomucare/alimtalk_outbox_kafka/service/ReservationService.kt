@@ -2,6 +2,7 @@ package nomucare.alimtalk_outbox_kafka.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import nomucare.alimtalk_outbox_kafka.model.OutboxEvent
+import nomucare.alimtalk_outbox_kafka.model.Reservation
 import nomucare.alimtalk_outbox_kafka.repository.OutboxEventRepository
 import nomucare.alimtalk_outbox_kafka.repository.ReservationRepository
 import org.springframework.stereotype.Service
@@ -14,7 +15,7 @@ class ReservationService(
     private val objectMapper: ObjectMapper,
 ) {
     @Transactional
-    fun createReservation(reservation: OutboxEvent): OutboxEvent {
+    fun createReservation(reservation: Reservation): Reservation {
 
         // 1. 예약 정보를 저장합니다.
         val savedReservation = reservationRepository.save(reservation)
@@ -34,11 +35,11 @@ class ReservationService(
         return savedReservation
     }
 
-    fun getReservationById(id: Long): OutboxEvent? {
+    fun getReservationById(id: Long): Reservation? {
         return reservationRepository.findById(id).orElse(null)
     }
 
-    fun getAllReservations(): List<OutboxEvent> {
+    fun getAllReservations(): List<Reservation> {
         return reservationRepository.findAll()
     }
 }

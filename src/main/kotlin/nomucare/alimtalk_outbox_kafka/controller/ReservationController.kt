@@ -1,6 +1,7 @@
 package nomucare.alimtalk_outbox_kafka.controller
 
 import nomucare.alimtalk_outbox_kafka.model.OutboxEvent
+import nomucare.alimtalk_outbox_kafka.model.Reservation
 import nomucare.alimtalk_outbox_kafka.service.ReservationService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -16,13 +17,13 @@ class ReservationController (
     private val reservationService: ReservationService
 ){
     @PostMapping
-    fun createReservation(@RequestBody OutboxEvent: OutboxEvent): ResponseEntity<OutboxEvent> {
-        val createdReservation = reservationService.createReservation(OutboxEvent)
+    fun createReservation(@RequestBody reservation: Reservation): ResponseEntity<Reservation> {
+        val createdReservation = reservationService.createReservation(reservation)
         return ResponseEntity.ok(createdReservation)
     }
 
     @GetMapping("/{id}")
-    fun getReservationById(@PathVariable("id") id: Long): ResponseEntity<OutboxEvent> {
+    fun getReservationById(@PathVariable("id") id: Long): ResponseEntity<Reservation> {
         val reservation = reservationService.getReservationById(id)
         return if (reservation != null) {
             ResponseEntity.ok(reservation)
@@ -32,7 +33,7 @@ class ReservationController (
     }
 
     @GetMapping
-    fun getAllReservations(): ResponseEntity<List<OutboxEvent>> {
+    fun getAllReservations(): ResponseEntity<List<Reservation>> {
         val reservations = reservationService.getAllReservations()
         return ResponseEntity.ok(reservations)
     }
