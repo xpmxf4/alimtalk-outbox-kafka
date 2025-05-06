@@ -1,23 +1,20 @@
 package nomucare.alimtalk_outbox_kafka.model
 
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
-import jakarta.persistence.Table
-import java.time.Instant
+import jakarta.persistence.*
+import java.time.LocalDate
 
 @Entity
-@Table(name = "outbox_events")
-data class Reservation (
+data class Reservation(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
-    val aggregateType: String,
-    val aggregateId: String,
-    val eventType: String,
-    @Column(columnDefinition = "TEXT")
-    val payload: String,
-    val createdAt: Instant = Instant.now(),
-    var processed: Boolean = false,
+    val guestName: String,
+    val roomNumber: String,
+    val checkInDate: LocalDate,
+    val checkOutDate: LocalDate,
+    @Enumerated(EnumType.STRING)
+    val status: ReservationStatus = ReservationStatus.CONFIRMED
 )
+
+enum class ReservationStatus {
+    CONFIRMED, CANCELLED, CHECKED_IN, CHECKED_OUT
+}

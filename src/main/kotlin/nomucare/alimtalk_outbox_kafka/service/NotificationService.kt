@@ -1,6 +1,7 @@
 package nomucare.alimtalk_outbox_kafka.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import nomucare.alimtalk_outbox_kafka.model.OutboxEvent
 import nomucare.alimtalk_outbox_kafka.model.Reservation
 import org.slf4j.LoggerFactory
 import org.springframework.kafka.annotation.KafkaListener
@@ -18,7 +19,10 @@ class NotificationService(
 
         try {
             // JSON 메세지를 Reservation 객체로 변환
-            val reservation = objectMapper.readValue(message, Reservation::class.java)
+            val reservation = objectMapper.readValue(
+                message,
+                Reservation::class.java
+            )
 
             // 알림톡 발송 로직 구현
             sendAlimtalk(reservation)
@@ -29,10 +33,12 @@ class NotificationService(
 
     private fun sendAlimtalk(reservation: Reservation) {
         // 실제로는 알림톡 호출 API 호출 코드가 들어가야 함
-        log.info("알림톡 발송: [${reservation.guestName}]님의 예약이 확정되었습니다. " +
-                "객실번호: ${reservation.roomNumber}, " +
-                "체크인: ${reservation.checkInDate}, " +
-                "체크아웃: ${reservation.checkOutDate}")
+        log.info(
+            "알림톡 발송: [${reservation.guestName}]님의 예약이 확정되었습니다. " +
+                    "객실번호: ${reservation.roomNumber}, " +
+                    "체크인: ${reservation.checkInDate}, " +
+                    "체크아웃: ${reservation.checkOutDate}"
+        )
     }
 
 
