@@ -2,7 +2,7 @@ services:
   mysql:
     image: mysql:8.0
     ports:
-      - "13306:3306"
+      - "13306:3306"  # 포트 충돌 방지를 위해 외부 포트 변경
     environment:
       MYSQL_ROOT_PASSWORD: rootpw
       MYSQL_DATABASE: hotel
@@ -11,6 +11,7 @@ services:
     command: --default-authentication-plugin=mysql_native_password --binlog-format=ROW
     volumes:
       - mysql-data:/var/lib/mysql
+      - ./init-scripts:/docker-entrypoint-initdb.d  # 초기화 스크립트
 
   zookeeper:
     image: confluentinc/cp-zookeeper:7.3.0
@@ -32,6 +33,7 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"  # 토픽 자동 생성 허용
 
   debezium:
     image: debezium/connect:2.3
@@ -46,6 +48,40 @@ services:
       CONFIG_STORAGE_TOPIC: connect_configs
       OFFSET_STORAGE_TOPIC: connect_offsets
       STATUS_STORAGE_TOPIC: connect_statuses
+
+  debezium-setup:
+    image: curlimages/curl:latest
+    depends_on:
+      - debezium
+    restart: on-failure
+    command: >
+      sh -c "
+        # Debezium Connect가 시작될 때까지 대기
+        echo 'Waiting for Debezium Connect to start...'
+        sleep 30
+        # 커넥터 생성
+        echo 'Creating Debezium connector...'
+        curl -X POST http://debezium:8083/connectors -H 'Content-Type: application/json' -d '{
+          \"name\": \"hotel-outbox-connector\",
+          \"config\": {
+            \"connector.class\": \"io.debezium.connector.mysql.MySqlConnector\",
+            \"database.hostname\": \"mysql\",
+            \"database.port\": \"3306\",
+            \"database.user\": \"user\",
+            \"database.password\": \"password\",
+            \"database.server.id\": \"1\",
+            \"database.server.name\": \"hotel-mysql\",
+            \"database.history.kafka.bootstrap.servers\": \"kafka:29092\",
+            \"database.history.kafka.topic\": \"schema-changes.hotel\",
+            \"table.include.list\": \"hotel.outbox_events\",
+            \"transforms\": \"outbox\",
+            \"transforms.outbox.type\": \"io.debezium.transforms.outbox.EventRouter\",
+            \"transforms.outbox.table.fields.additional.placement\": \"aggregateType:header:eventType\",
+            \"transforms.outbox.route.topic.replacement\": \"hotel-reservation-events\"
+          }
+        }'
+        echo 'Debezium connector setup completed'
+      "
 
 volumes:
   mysql-data:

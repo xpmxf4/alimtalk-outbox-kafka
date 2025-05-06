@@ -5,14 +5,17 @@ spring:
     password: password
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: none # Hibernate 가 스키마를 자동 생성하지 않도록 설정
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
+  sql:
+    init:
+      mode: always # 애플리케이션 시작 시마다 SQL 스크립트 실행
   kafka:
     bootstrap-servers: localhost:9092
     consumer:
-      group-id: notification-service
+      group-id: hotel-reservation-events
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
