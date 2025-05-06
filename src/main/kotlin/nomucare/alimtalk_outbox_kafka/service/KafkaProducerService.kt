@@ -8,7 +8,7 @@ class KafkaProducerService(
     private val kafkaTemplate: KafkaTemplate<String, String>,
 ) {
     fun sendNotificationEvent(key: String, event: String) {
-        kafkaTemplate.send("notification-events", key, event)
+        kafkaTemplate.send("reservation", key, event)
             .whenComplete { result, ex ->
             if (ex == null) {
                 println("메세지 전송 성공: $key")

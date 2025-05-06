@@ -12,7 +12,7 @@ class NotificationService(
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
 
-    @KafkaListener(topics = ["notification-events"], groupId = "notification-service")
+    @KafkaListener(topics = ["reservation"], groupId = "notification-service")
     fun consumeNotificationEvent(message: String) {
         log.info("알림 이벤트 수신 : {}", message)
 
