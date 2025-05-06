@@ -1,7 +1,6 @@
 package nomucare.alimtalk_outbox_kafka.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import nomucare.alimtalk_outbox_kafka.model.OutboxEvent
 import nomucare.alimtalk_outbox_kafka.model.Reservation
 import org.slf4j.LoggerFactory
 import org.springframework.kafka.annotation.KafkaListener
